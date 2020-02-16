@@ -11,6 +11,9 @@
     "start": "node index.js"
   },
   "dependencies": {
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-prettier": "^3.1.2",
     "googleapis": "^47.0.0",
     "youtube-dl": "^3.0.2"
   }

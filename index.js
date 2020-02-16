@@ -1,18 +1,21 @@
 const fs = require('fs');
 const readline = require('readline');
 
-const {google} = require('googleapis');
+const { google } = require('googleapis');
 const youtubedl = require('youtube-dl');
 
 const SCOPES = 'https://www.googleapis.com/auth/youtube';
 const TOKEN_PATH = 'token.json';
 
-let songs = []
+let songs = [];
 
 function authorize(credentials, callback) {
-  const {client_secret, client_id, redirect_uris} = credentials.installed;
+  const { client_secret, client_id, redirect_uris } = credentials.installed;
   const oAuth2Client = new google.auth.OAuth2(
-      client_id, client_secret, redirect_uris[0]);
+    client_id,
+    client_secret,
+    redirect_uris[0]
+  );
 
   // Check if we have previously stored a token.
   fs.readFile(TOKEN_PATH, (err, token) => {
@@ -32,13 +35,13 @@ function getAccessToken(oAuth2Client, callback) {
     input: process.stdin,
     output: process.stdout,
   });
-  rl.question('Enter the code from that page here: ', (code) => {
+  rl.question('Enter the code from that page here: ', code => {
     rl.close();
     oAuth2Client.getToken(code, (err, token) => {
       if (err) return console.error('Error retrieving access token', err);
       oAuth2Client.setCredentials(token);
       // Store the token to disk for later program executions
-      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
+      fs.writeFile(TOKEN_PATH, JSON.stringify(token), err => {
         if (err) return console.error(err);
         console.log('Token stored to', TOKEN_PATH);
       });
@@ -65,13 +68,13 @@ async function fetchPlaylistVideos(auth) {
       auth,
       part: 'id,snippet,contentDetails,status',
       playlistId: 'PLsEAJsDdJyviPM-Yj48UlYt6RiSpTw6LB',
-      maxResults: 50
+      maxResults: 50,
     });
 
     const youtubePlaylist = items.map(item => ({
-        videoTitle: item.snippet.title,
-        url: `https://www.youtube.com/watch?v=${item.contentDetails.videoId}`
-      }));
+      videoTitle: item.snippet.title,
+      url: `https://www.youtube.com/watch?v=${item.contentDetails.videoId}`,
+    }));
 
     fetchVideosInfo(youtubePlaylist);
   } catch (error) {
@@ -81,13 +84,20 @@ async function fetchPlaylistVideos(auth) {
 
 // Pega as infos dos vídeos
 function fetchVideosInfo(youtubePlaylist) {
-  youtubedl.getInfo(youtubePlaylist.map(({url}) => url), (err, info) => {
+  youtubedl.getInfo(
+    youtubePlaylist.map(({ url }) => url),
+    (err, info) => {
       if (err) console.log(err);
-      const allVideosInfo = info.map(({ track, artist, title }) => ({ track, artist, title }));
+      const allVideosInfo = info.map(({ track, artist, title }) => ({
+        track,
+        artist,
+        title,
+      }));
       const allSongsInfo = allVideosInfo.filter(song => !!song.track);
 
       saveSongsInfo(allSongsInfo);
-    });
+    }
+  );
 }
 
 // Salva as infos
@@ -100,4 +110,4 @@ function saveSongsInfo(songsInfo) {
 // Procurar as músicas no Spotify
 // Adicionar as músicas encontradas à playlist
 
-youtubeLogin()
+youtubeLogin();
