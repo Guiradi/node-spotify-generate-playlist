@@ -7,6 +7,8 @@ const youtubedl = require('youtube-dl');
 const SCOPES = 'https://www.googleapis.com/auth/youtube';
 const TOKEN_PATH = 'token.json';
 
+let songs = []
+
 function authorize(credentials, callback) {
   const {client_secret, client_id, redirect_uris} = credentials.installed;
   const oAuth2Client = new google.auth.OAuth2(
@@ -55,7 +57,7 @@ function youtubeLogin() {
   });
 }
 
-// Escolher a lista de vídeos para ser transformada e pegar os vídeos (infos)
+// Escolher a lista de vídeos para ser transformada e pegar os vídeos
 async function fetchPlaylistVideos(auth) {
   try {
     const youtube = google.youtube('v3');
@@ -71,22 +73,27 @@ async function fetchPlaylistVideos(auth) {
         url: `https://www.youtube.com/watch?v=${item.contentDetails.videoId}`
       }));
 
-    youtubedl.getInfo(youtubePlaylist.map(({url}) => url), (err, info) => {
-      if (err) console.log(err);
-      const allVideosInfo = info.map(({ track, artist }) => ({ track, artist }));
-      const allSongsInfo = allVideosInfo.filter(song => !!song.track);
-
-      saveSongsInfo(allSongsInfo);
-    });
-
+    fetchVideosInfo(youtubePlaylist);
   } catch (error) {
     console.error(error);
   }
 }
 
+// Pega as infos dos vídeos
+function fetchVideosInfo(youtubePlaylist) {
+  youtubedl.getInfo(youtubePlaylist.map(({url}) => url), (err, info) => {
+      if (err) console.log(err);
+      const allVideosInfo = info.map(({ track, artist, title }) => ({ track, artist, title }));
+      const allSongsInfo = allVideosInfo.filter(song => !!song.track);
+
+      saveSongsInfo(allSongsInfo);
+    });
+}
+
 // Salva as infos
 function saveSongsInfo(songsInfo) {
-  console.log(songsInfo);
+  songs = songsInfo;
+  console.log(songs);
 }
 
 // Criar uma nova playlist no Spotify
