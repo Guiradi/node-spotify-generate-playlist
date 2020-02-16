@@ -1,0 +1,17 @@
+{
+  "name": "spotify-generate-playlist",
+  "version": "1.0.0",
+  "description": "An NodeJS application for generating spotify playlists from youtube playlists",
+  "main": "index.js",
+  "repository": "git@github.com:Guiradi/node-spotify-generate-playlist.git",
+  "author": "Guiradi <g.ferreira@unesp.br>",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "googleapis": "^47.0.0",
+    "youtube-dl": "^3.0.2"
+  }
+}
